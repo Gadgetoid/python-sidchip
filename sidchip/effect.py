@@ -3,38 +3,46 @@ from math import sin
 from time import time
 
 class SIDEffect(SIDVoice):
-   def __init__(self, parent):
-       self.__dict__['_parent'] = parent
+    def __init__(self, parent):
+        self.__dict__['_parent'] = parent
 
-   def __setattr__(self, name, value):
-       if name in self.__dict__.keys():
-           self.__dict__[name] = value
-       elif '_parent' in self.__dict__.keys():
-           self.__dict__['_parent'].__dict__[name] = value
+    def __setattr__(self, name, value):
+        ''' Sets an attribute on the child instance if it exists,
+        falls back to setting on the parent class instance
+        '''
+        if hasattr(self, name):
+            self.__dict__[name] = value
+        elif hasattr(self, '_parent'):
+            setattr(self._parent, name, value)
 
-   def __getattr__(self, name):
-       if name in self.__dict__.keys():
-           return self.__dict__[name]
+    def __getattr__(self, name):
+        ''' Tries to retrieve an attribute from the parent class instance,
+        falls back to retreiving from the child class instance.
+        '''
+        if hasattr(self,'_parent') and hasattr(self._parent, name):
+            return getattr(self.__dict__['_parent'],name)
 
-       elif '_parent' in self.__dict__.keys() and hasattr(self.__dict__['_parent'], name):
-           return getattr(self.__dict__['_parent'],name)
+        return self.__getattribute__(name)
 
-       elif '_parent' in self.__dict__.keys() and  name in self.__dict__['_parent'].__dict__.keys():
-           return self.__dict__['_parent'].__dict__[name]
+    def set_effect_attr(self, name, value):
+        ''' Sets an attribute local to the child effect class instance, 
+        rather than setting it on _parent
+        '''
+        self.__dict__[name] = value
 
-       else:
-           raise AttributeError("No attribute {name}".format(name=name))
 
 class Vibrato(SIDEffect):
     def __init__(self, parent, frequency=10, depth=100):
-
-        self.__dict__['_vibrato_frequency'] = frequency
-        self.__dict__['_vibrato_depth'] = depth
-
         SIDEffect.__init__(self, parent)
 
+        self.set_effect_attr('_vibrato_frequency', frequency)
+        self.set_effect_attr('_vibrato_depth', depth)
+
     def _get_frequency(self):
-        vibrato = ((sin(time() * self._vibrato_frequency) + 1) / 2) * self._vibrato_depth
+        vibrato_frequency = self._vibrato_frequency() if callable(self._vibrato_frequency) else self._vibrato_frequency
+        vibrato_depth = self._vibrato_depth() if callable(self._vibrato_depth) else self._vibrato_depth
+
+        vibrato = ((sin(time() * vibrato_frequency) + 1) / 2) * vibrato_depth
 
         return self._parent.frequency + vibrato
 
