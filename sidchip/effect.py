@@ -5,6 +5,7 @@ from time import time
 class SIDEffect(SIDVoice):
     def __init__(self, parent):
         self.__dict__['_parent'] = parent
+        self.__dict__['_patch'] = {}
 
     def __setattr__(self, name, value):
         ''' Sets an attribute on the child instance if it exists,
@@ -15,10 +16,18 @@ class SIDEffect(SIDVoice):
         elif hasattr(self, '_parent'):
             setattr(self._parent, name, value)
 
+    def patch(self, name, value):
+        self.__dict__['_patch'][name] = value
+
     def __getattr__(self, name):
         ''' Tries to retrieve an attribute from the parent class instance,
         falls back to retreiving from the child class instance.
         '''
+        if self.__dict__['_patch'].has_key(name):
+            return self.__dict__['_patch'][name]()
+
+        #print(hasattr(self,'_parent'), hasattr(self._parent, name), getattr(self.__dict__['_parent'],name))
+
         if hasattr(self,'_parent') and hasattr(self._parent, name):
             return getattr(self.__dict__['_parent'],name)
 
@@ -32,34 +41,44 @@ class SIDEffect(SIDVoice):
 
 
 class Gate(SIDEffect):
-    def __init__(self, parent, frequency=100):
+    def __init__(self, parent, frequency=100, duty_cycle=0.5, delta=None):
         SIDEffect.__init__(self, parent)
 
+        if delta is None: delta = time
+        self.set_effect_attr('_time', time)
         self.set_effect_attr('_gate_frequency', frequency)
+
+        self.patch('gate', self._get_gate)
 
     def _get_gate(self):
         gate_frequency = self._gate_frequency() if callable(self._gate_frequency) else self._gate_frequency
+        delta = self._time() if callable(self._time) else self._time
 
-        return (int(round((time()*gate_frequency) % 2) == 1)) and self._parent.gate
+        #print(time, gate_frequency)
 
-    def _set_gate(self, value):
-        self._parent.gate = value
+        return (int((delta*gate_frequency) % 2) == 1) and self._parent.gate
 
-    gate = property(_get_gate)
+    #def _set_gate(self, value):
+    #    self._parent.gate = value
+
+    #gate = property(_get_gate, _set_gate)
 
 
 class Vibrato(SIDEffect):
-    def __init__(self, parent, frequency=10, depth=100):
+    def __init__(self, parent, frequency=10, depth=100, delta=None):
         SIDEffect.__init__(self, parent)
 
+        if delta is None: delta = time
+        self.set_effect_attr('_time', time)
         self.set_effect_attr('_vibrato_frequency', frequency)
         self.set_effect_attr('_vibrato_depth', depth)
 
     def _get_frequency(self):
         vibrato_frequency = self._vibrato_frequency() if callable(self._vibrato_frequency) else self._vibrato_frequency
         vibrato_depth = self._vibrato_depth() if callable(self._vibrato_depth) else self._vibrato_depth
+        delta = self._time() if callable(self._time) else self._time
 
-        vibrato = ((sin(time() * vibrato_frequency) + 1) / 2) * vibrato_depth
+        vibrato = ((sin(delta * vibrato_frequency) + 1) / 2) * vibrato_depth
 
         return self._parent.frequency + vibrato
 

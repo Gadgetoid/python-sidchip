@@ -15,3 +15,8 @@ class Transport:
         self.serial.close()
 
 
+class DummyTransport:
+    def __init__(self, port):
+        pass
+    def send(self, data):
+        print(data)
