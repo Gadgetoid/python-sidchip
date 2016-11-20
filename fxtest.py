@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from sidchip import SIDChip
 from sidchip.voice import SIDVoice
 from sidchip.effect import Vibrato, Gate

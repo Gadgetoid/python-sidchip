@@ -12,7 +12,7 @@ sdl_libs = os.popen('sdl-config --libs').read().strip().split(' ')
 
 module_pysid = Extension('pysid',
                 sources = ['pysid.cpp'],
-                extra_compile_args=sdl_flags + ['-O3','-std=c++11'],
+                extra_compile_args=sdl_flags + ['-O3','-I./resid-0.16','-std=c++11'],
                 extra_link_args=['-lresid'] + sdl_libs
               )
 
