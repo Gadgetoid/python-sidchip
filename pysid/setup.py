@@ -7,16 +7,13 @@ except ImportError:
 
 import os
 
-RESID_PATH = "resid-0.16/"
-
 sdl_flags = os.popen('sdl-config --cflags').read().strip().split(' ')
 sdl_libs = os.popen('sdl-config --libs').read().strip().split(' ')
 
 module_pysid = Extension('pysid',
                 sources = ['pysid.cpp'],
-                extra_compile_args=sdl_flags + ['-O3','-I{}'.format(RESID_PATH),'-std=c++11','-std=c++11'],
+                extra_compile_args=sdl_flags + ['-O3','-std=c++11'],
                 extra_link_args=['-lresid'] + sdl_libs
-
               )
 
 setup (name = 'PySID',

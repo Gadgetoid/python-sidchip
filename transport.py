@@ -3,7 +3,7 @@ import os
 
 class PySID:
     def __init__(self, nothing):
-        from pysid import pysid
+        import pysid
         self.pysid = pysid
 
     def send(self, regs):

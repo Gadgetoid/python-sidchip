@@ -1,0 +1,8 @@
+.deps/
+.libs/
+Makefile
+config.log
+config.status
+*.l[oa]
+*.cache/
+libtool
