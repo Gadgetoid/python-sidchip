@@ -1,7 +1,7 @@
 #include <iostream>
 #include <stdio.h>
-#include <sdl.h>
-#include <python.h>
+#include <SDL.h>
+#include <Python.h>
 #include <sid.h>
 
 #define SAMPLE_RATE   44100
