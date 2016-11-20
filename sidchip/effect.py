@@ -11,7 +11,7 @@ class SIDEffect(SIDVoice):
         ''' Sets an attribute on the child instance if it exists,
         falls back to setting on the parent class instance
         '''
-        if self.__dict__.has_key(name):
+        if name in self.__dict__:
             self.__dict__[name] = value
         elif hasattr(self, '_parent'):
             setattr(self._parent, name, value)
@@ -23,10 +23,8 @@ class SIDEffect(SIDVoice):
         ''' Tries to retrieve an attribute from the parent class instance,
         falls back to retreiving from the child class instance.
         '''
-        if self.__dict__['_patch'].has_key(name):
+        if name in self.__dict__['_patch']:
             return self.__dict__['_patch'][name]()
-
-        #print(hasattr(self,'_parent'), hasattr(self._parent, name), getattr(self.__dict__['_parent'],name))
 
         if hasattr(self,'_parent') and hasattr(self._parent, name):
             return getattr(self.__dict__['_parent'],name)
@@ -54,14 +52,7 @@ class Gate(SIDEffect):
         gate_frequency = self._gate_frequency() if callable(self._gate_frequency) else self._gate_frequency
         delta = self._time() if callable(self._time) else self._time
 
-        #print(time, gate_frequency)
-
         return (int((delta*gate_frequency) % 2) == 1) and self._parent.gate
-
-    #def _set_gate(self, value):
-    #    self._parent.gate = value
-
-    #gate = property(_get_gate, _set_gate)
 
 
 class Vibrato(SIDEffect):
