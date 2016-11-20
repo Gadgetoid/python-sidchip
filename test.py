@@ -2,13 +2,7 @@ from sidchip import SIDChip
 from sidchip.effect import Vibrato
 import time
 from math import sin
-
-class Transport:
-    def __init__(self, port):
-        pass
-
-    def send(self, data):
-        print(data)
+from transport import PySID as Transport
 
 
 if __name__ == "__main__":
@@ -16,15 +10,15 @@ if __name__ == "__main__":
     sid = SIDChip()
     sid.filter.volume = 10
 
-    t = Transport('/dev/tty.usbserial-DA00V5UX')
+    t = Transport('/tmp/reSID')
 
     
     sid.voice1 = Vibrato(sid.voice1, frequency=10, depth=100)
     sid.voice1.midi_to_frequency(69)
 
-    while True:
-        t.send(sid.get_regs())
-        time.sleep(1)
+    #while True:
+    #    t.send(sid.get_regs())
+    #    time.sleep(1)
 
 
 
