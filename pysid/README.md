@@ -10,9 +10,10 @@ Build and install resid:
 
 ```
 cd resid-0.16/
-./configure
+./configure --enable-shared
 make
 sudo make install
+sudo ldconfig
 ```
 
 Build and install this module:
